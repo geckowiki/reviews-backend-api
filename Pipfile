@@ -11,6 +11,7 @@ alembic = "*"
 psycopg2 = "*"
 asyncpg = "*"
 fastapi-users = {extras = ["sqlalchemy"], version = "*"}
+click = "*"
 
 [dev-packages]
 flake8 = "*"
