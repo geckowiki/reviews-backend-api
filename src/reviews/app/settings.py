@@ -1,6 +1,5 @@
 import os
 from enum import Enum
-from re import M
 
 
 class DBDriver(str, Enum):

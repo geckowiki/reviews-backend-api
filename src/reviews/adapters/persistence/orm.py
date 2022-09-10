@@ -1,9 +1,10 @@
 from typing import AsyncGenerator
 import uuid
 
-from sqlalchemy import Table, Column, String, Boolean, create_engine
+from sqlalchemy import Table, Column, String, Boolean, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.sql import func
 
 from fastapi import Depends
 
@@ -14,6 +15,7 @@ from fastapi_users_db_sqlalchemy import (
 from fastapi_users_db_sqlalchemy.generics import GUID
 
 from domain.model.user import User as UserDomain
+from domain.model.videoclip import Videoclip as VideoclipDomain
 from app.settings import settings, DBDriver
 
 
@@ -45,6 +47,17 @@ user_table = Table(
     Column("is_verified", Boolean, default=False, nullable=False),
 )
 
+videoclip_table = Table(
+    "videoclip",
+    Base.metadata,
+    Column("id", GUID, primary_key=True, default=uuid.uuid4),
+    Column("name", String(length=255), index=True, nullable=False),
+    Column("filepath", String(length=255), nullable=False),
+    Column("uploaded", DateTime(timezone=True), default=func.now()),
+    Column("hash_id", String(length=64), index=True, unique=True, nullable=False),
+    Column("author_id", ForeignKey("user.id")),
+)
+
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __table__ = user_table
@@ -70,3 +83,4 @@ async def get_user_db(session: AsyncSession = Depends(get_async_session)):
 
 def map_to_domain():
     Base.registry.map_imperatively(UserDomain, user_table)
+    Base.registry.map_imperatively(VideoclipDomain, videoclip_table)
