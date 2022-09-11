@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from pathlib import Path
 
 
 class DBDriver(str, Enum):
@@ -9,6 +10,7 @@ class DBDriver(str, Enum):
 
 class Settings:
     SECRET_KEY = "iva-t7oyv1rdk#e6()#wvve7*3q3par26(7u3n(ne1sr*4ht@a"
+    MEDIA_ROOT = os.path.join(Path(__file__).resolve().parent.parent.parent.parent, "media")
 
     def get_database_url(self, db_driver: DBDriver = DBDriver.SYNC) -> str:
         return "{db_driver}://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}".format(

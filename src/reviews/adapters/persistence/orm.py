@@ -1,7 +1,15 @@
 from typing import AsyncGenerator
 import uuid
 
-from sqlalchemy import Table, Column, String, Boolean, DateTime, ForeignKey, create_engine
+from sqlalchemy import (
+    Table,
+    Column,
+    String,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.sql import func
@@ -61,6 +69,16 @@ videoclip_table = Table(
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __table__ = user_table
+
+    def to_domain(self) -> UserDomain:
+        return UserDomain(
+            id=self.id,
+            email=self.email,
+            hashed_password=self.hashed_password,
+            is_active=self.is_active,
+            is_superuser=self.is_superuser,
+            is_verified=self.is_verified,
+        )
 
 
 async_engine = create_async_engine(settings.get_database_url(DBDriver.ASYNC))

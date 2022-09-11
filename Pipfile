@@ -13,6 +13,7 @@ asyncpg = "*"
 fastapi-users = {extras = ["sqlalchemy"], version = "*"}
 click = "*"
 python-multipart = "*"
+hashids = "*"
 
 [dev-packages]
 flake8 = "*"
