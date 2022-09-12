@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from adapters.persistence import auth
-from adapters.http.api_v1 import videoclips
+from adapters.http.api_v1 import videoclips, reviews
 
 
 api_router = APIRouter()
@@ -18,3 +18,4 @@ api_router.include_router(
 )
 
 api_router.include_router(videoclips.router)
+api_router.include_router(reviews.router)

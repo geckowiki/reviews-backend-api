@@ -1,5 +1,5 @@
 from adapters.persistence.orm import sync_session_maker
-from adapters.persistence.repositories import VideoclipRepository
+from adapters.persistence.repositories import VideoclipRepository, ReviewRepository
 from adapters.persistence.file_uploader import FileUploader
 from domain.services.message_bus import MessageBus
 
@@ -9,5 +9,6 @@ def dependency_message_bus():
         message_bus = MessageBus(
             file_uploader=FileUploader(),
             videoclip_repository=VideoclipRepository(session),
+            review_repository=ReviewRepository(session),
         )
         return message_bus

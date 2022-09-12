@@ -25,3 +25,6 @@ class User(Entity[UUID]):
         self.is_active = is_active
         self.is_superuser = is_superuser
         self.is_verified = is_verified
+    
+    def __repr__(self) -> str:
+        return f"User({self.id}, {self.email})"

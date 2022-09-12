@@ -8,9 +8,10 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Text,
     create_engine,
 )
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.sql import func
 
@@ -24,6 +25,7 @@ from fastapi_users_db_sqlalchemy.generics import GUID
 
 from domain.model.user import User as UserDomain
 from domain.model.videoclip import Videoclip as VideoclipDomain
+from domain.model.review import Review as ReviewDomain
 from app.settings import settings, DBDriver
 
 
@@ -66,6 +68,18 @@ videoclip_table = Table(
     Column("author_id", ForeignKey("user.id")),
 )
 
+review_table = Table(
+    "review",
+    Base.metadata,
+    Column("id", GUID, primary_key=True, default=uuid.uuid4),
+    Column("imagepath", String(length=255), nullable=False),
+    Column("text", Text, nullable=False),
+    Column("hash_id", String(length=64), index=True, unique=True, nullable=False),
+    Column("published", DateTime(timezone=True), default=func.now()),
+    Column("videoclip_id", ForeignKey("videoclip.id")),
+    Column("author_id", ForeignKey("user.id")),
+)
+
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __table__ = user_table
@@ -101,4 +115,15 @@ async def get_user_db(session: AsyncSession = Depends(get_async_session)):
 
 def map_to_domain():
     Base.registry.map_imperatively(UserDomain, user_table)
-    Base.registry.map_imperatively(VideoclipDomain, videoclip_table)
+    review_mapper = Base.registry.map_imperatively(ReviewDomain, review_table)
+
+    Base.registry.map_imperatively(
+        VideoclipDomain,
+        videoclip_table,
+        properties={
+            "reviews": relationship(
+                review_mapper,
+                collection_class=list,
+            )
+        },
+    )
